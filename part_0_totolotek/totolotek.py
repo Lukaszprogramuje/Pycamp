@@ -1,9 +1,8 @@
 import random
 
 koszt_zakladu = 3
-koszt_calkowity = 0
 wygrana = 0
-tygodnie = 0
+licznik_losowan = 0
 trojka = 10
 ile_trojek = 0
 czworka = 170
@@ -11,19 +10,25 @@ ile_czworek = 0
 piatka = 5300
 ile_piatek = 0
 szostka = 2000000
-losowanie = set()
 moje = {10, 13, 18, 23, 35, 42}
 #6 liczb od 1 do 49
 # co tydzien 1 losowanie, porównujemy ze swoimi
 # ile tygodni trzeba grać aby wylosować 6
 
-liczby_do_losowania = set()
-for i in range(1, 50):
-    liczby_do_losowania.add(i)
+liczby_do_losowania = range(1, 50)
 
 def losowanie(liczby_do_losowania):
     wylosowane = set(random.sample(liczby_do_losowania, 6))
     return wylosowane
+
+def test_losowanie():
+    #given
+    #when
+    wylosowane = sorted(list(losowanie(liczby_do_losowania)))
+    #then
+    assert len(wylosowane) == 6
+    assert wylosowane[0] >= 1
+    assert wylosowane[-1] <= 49
 
 def sprawdzanie_wynikow(moje, wylosowane):
     trafione = 0
@@ -32,11 +37,11 @@ def sprawdzanie_wynikow(moje, wylosowane):
             trafione += 1
     return trafione
 
-wynik = 0
-while wynik < 6:
-    wylosowane = losowanie(liczby_do_losowania)
-    wynik = sprawdzanie_wynikow(moje, wylosowane)
-    koszt_calkowity += koszt_zakladu
+def sprawdzanie_wygranej(wynik):
+    global ile_trojek
+    global ile_czworek
+    global ile_piatek
+    global wygrana
     if wynik == 6:
         wygrana += szostka
     if wynik == 5:
@@ -49,10 +54,25 @@ while wynik < 6:
         wygrana += trojka
         ile_trojek += 1
 
-print(f"trojek = {ile_trojek}")
-print(f"czworek = {ile_czworek}")
-print(f"piatek = {ile_piatek}")
-print(f"calkowity koszto = {koszt_calkowity}")
-print(f"wygrana = {wygrana}")
-print(f"ile losowan = {koszt_calkowity/koszt_zakladu}")
+if __name__ == "__main__":
+    wynik = 0
+    while wynik < 6:
+        wylosowane = losowanie(liczby_do_losowania)
+        wynik = sprawdzanie_wynikow(moje, wylosowane)
+        sprawdzanie_wygranej(wynik)
+        licznik_losowan += 1
+    
+    koszt_calkowity = licznik_losowan * koszt_zakladu
 
+    print(f"trójek =          {ile_trojek:9}")
+    print(f"czwórek =         {ile_czworek:9}")
+    print(f"piątek =          {ile_piatek:9}")
+    print(f"calkowity koszt = {koszt_calkowity:9,} zł")
+    print(f"wygrana =         {wygrana:9,} zł")
+    print(f"potrzeba było     {licznik_losowan:9,} losowań")
+    if koszt_calkowity > wygrana:
+        print(f"straciłeś         {koszt_calkowity - wygrana:9,} zł")
+    elif koszt_calkowity < wygrana:
+        print(f"zyskałeś          {wygrana - koszt_calkowity:9,}")
+    else:
+        print("po wszystkim wyszedłeś na 0")
